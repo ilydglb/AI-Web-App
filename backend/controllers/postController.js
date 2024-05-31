@@ -1,19 +1,27 @@
 import Post from '../models/postModel.js';
 import mongoose from 'mongoose';
+import {categorizeContent,summarizeContent} from '../utils/connctAI.js';
 
 const createPost = async (req, res, next) => {
-    const { title, content, postedBy, image, categories, likes, comments } = req.body;
+    const { title, content, image, reviewPost } = req.body; //kullanicidan alinanlar
 
     try {
-
-
         const post = await Post.create({
             title,
             content,
             postedBy: req.user.username,
-            categories,
             image,
+            reviewPost,
 
+            ratings:[],
+            averageRating:0,
+            comments:[],
+
+            category: await categorizeContent(content),
+            spam:false,
+            tags:[],
+            summary:await summarizeContent(content),
+            review:false
         });
         res.status(201).json({
             success: true,
