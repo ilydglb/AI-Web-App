@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
 
 const ratingSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    username: { type: String, required: true }, // Add username field for rating
     rating: { type: Number, required: true }
 });
 const commentSchema = new mongoose.Schema({
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    username: { type: String, required: true }, // Add username field for rating
     comment: { type: String, required: true }
 });
 

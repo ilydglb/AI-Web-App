@@ -113,8 +113,9 @@ const ratePost = async (req, res, next) => {
         }
 
         // Validate the rating value
-        if (rating < 1 || rating > 5) {
-            return res.status(400).json({ message: 'Rating must be between 1 and 5' });
+        const numericRating = parseInt(rating);
+        if (numericRating < 1 || numericRating > 5 || isNaN(numericRating)) {
+            return res.status(400).json({ message: 'Rating must be a numeric value between 1 and 5' });
         }
 
         // Find the post by ID
@@ -123,16 +124,20 @@ const ratePost = async (req, res, next) => {
             return res.status(404).json({ message: 'Post not found' });
         }
 
-        // Find existing rating by user
-        const existingRating = post.ratings.find(r => r.userId.equals(req.user._id));
-        if (existingRating) {
-            existingRating.rating = rating;
+        // Check if the user has already rated this post
+        const existingRatingIndex = post.ratings.findIndex(r => r.username === req.user.username);
+
+        if (existingRatingIndex !== -1) {
+            // User has already rated the post, update their rating
+            post.ratings[existingRatingIndex].rating = numericRating;
         } else {
-            post.ratings.push({ userId: req.user._id, rating });
+            // User has not rated the post yet, add a new rating
+            post.ratings.push({ username: req.user.username, rating: numericRating });
         }
 
-        // Calculate and update the average rating
+        // Calculate and update average rating
         post.averageRating = post.calculateAverageRating();
+        post.averageRating = Math.round(post.averageRating * 10) / 10; // Round to 1 decimal place
         await post.save();
 
         res.status(200).json(post);
@@ -146,7 +151,7 @@ const commentOnPost = async (req, res, next) => {
     try {
         const { postId, comment } = req.body;
 
-        // Check if postId is a valid MongoDB ObjectId
+         // Check if postId is a valid MongoDB ObjectId
         if (!mongoose.Types.ObjectId.isValid(postId)) {
             return res.status(400).json({ message: 'Invalid post ID' });
         }
@@ -158,7 +163,7 @@ const commentOnPost = async (req, res, next) => {
         }
 
         // Add the comment to the post
-        post.comments.push({ userId: req.user._id, comment });
+        post.comments.push({username: req.user.username, comment });
         await post.save();
 
         res.status(200).json(post);
