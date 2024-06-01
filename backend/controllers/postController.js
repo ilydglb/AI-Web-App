@@ -1,6 +1,6 @@
 import Post from '../models/postModel.js';
 import mongoose from 'mongoose';
-import {categorizeContent,summarizeContent} from '../utils/connctAI.js';
+import {categorizeContent, summarizeContent, checkSpam, reviewContent, tagPost} from '../utils/connectAI.js';
 
 const createPost = async (req, res, next) => {
     const { title, content, image, reviewPost } = req.body; //kullanicidan alinanlar
@@ -11,17 +11,17 @@ const createPost = async (req, res, next) => {
             content,
             postedBy: req.user.username,
             image,
-            reviewPost,
+            reviewPost:true,
 
             ratings:[],
             averageRating:0,
             comments:[],
 
             category: await categorizeContent(content),
-            spam:false,
-            tags:[],
-            summary:await summarizeContent(content),
-            review:false
+            spam: await checkSpam(content),
+          tags:await tagPost(content),
+           summary:await summarizeContent(content),
+            review:await reviewContent(content)
         });
         res.status(201).json({
             success: true,

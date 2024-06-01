@@ -20,12 +20,12 @@ const postSchema = new mongoose.Schema(
         comments: { type: [commentSchema], default: [] },
         averageRating: { type: Number, default: 0 },
         category: { type: String, default: null  },
-        spam: { type: Boolean, default: false },
-        tags: { type: [String], default: [] },
+        spam:{type:String}, //0-1
+        tags: { type: String, default: null },
         summary: { type: String, default: '' },
         reviewPost: { type: Boolean, default: false },
-        review: { type: String, default: null },
-    },
+        review: { type:String }, //0-1
+    }, 
     { timestamps: true }
 );
 
