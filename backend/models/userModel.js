@@ -21,10 +21,16 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "",
     },
-    role:{
-      type: String,   
+    role: {
+      type: String,
       default: 'user',
-    }
+    },
+    following: [{
+      type: String, // Store usernames
+    }],
+    followers: [{
+      type: String, // Store usernames
+    }],
   },
   {
     timestamps: true,
@@ -34,7 +40,6 @@ const userSchema = mongoose.Schema(
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.hashedPassword);
 };
-
 
 const User = mongoose.model('User', userSchema);
 

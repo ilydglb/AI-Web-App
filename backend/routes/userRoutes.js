@@ -6,7 +6,9 @@ import {
   getUserProfile,
   updateUserProfile,
   deleteUser,
-  getUsers
+  getUsers,
+  followUser,
+  unfollowUser
 } from '../controllers/userController.js';
 import { handleRefreshToken } from '../controllers/refreshTController.js';
 import { verifyJWT, isTheUserOrAdmin } from '../middleware/auth.js';
@@ -23,7 +25,8 @@ router.route('/profile')
   .put(verifyJWT, updateUserProfile)
 
 router.get('/', verifyJWT, getUsers);
-
+router.post('/follow', verifyJWT, followUser); // protected route
+router.post('/unfollow', verifyJWT, unfollowUser); // protected route
 router.delete('/:username', verifyJWT, isTheUserOrAdmin, deleteUser);
 
 export default router;
