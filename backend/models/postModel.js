@@ -15,17 +15,17 @@ const postSchema = new mongoose.Schema(
         title: { type: String, required: [true, 'title is required'] },
         content: { type: String, required: [true, 'content is required'] },
         postedBy: { type: String, ref: 'User' },
-        categories: { type: Array },
         image: { type: String, default: '' },
-        ratings: [ratingSchema],
-        comments: [commentSchema],
+        ratings:{ type: [ratingSchema], default: [] },
+        comments: { type: [commentSchema], default: [] },
         averageRating: { type: Number, default: 0 },
-        spam: { type: Boolean, default: false },
-        tags: { type: [String], default: [] },
+        category: { type: String, default: null  },
+        spam:{type:String}, //0-1
+        tags: { type: String, default: null },
         summary: { type: String, default: '' },
         reviewPost: { type: Boolean, default: false },
-        review: { type: String, default: null },
-    },
+        review: { type:String }, //0-1
+    }, 
     { timestamps: true }
 );
 
