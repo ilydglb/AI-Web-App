@@ -177,10 +177,82 @@ const deleteUser = asyncHandler(async(req,res)=>{
   }
 });
 
+
+
+const followUser = asyncHandler(async (req, res) => {
+  const { usernameToFollow } = req.body;
+
+  if (!usernameToFollow) {
+    return res.status(400).json({ error: 'Username to follow is required' });
+  }
+
+  const userToFollow = await User.findOne({ username: usernameToFollow });
+
+  if (!userToFollow) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  const user = req.user;
+
+  if (userToFollow.followers.includes(user.username)) {
+    res.status(400);
+    throw new Error('You already follow this user');
+  }
+
+  userToFollow.followers.push(user.username);
+  user.following.push(userToFollow.username);
+
+  await userToFollow.save();
+  await user.save();
+
+  res.status(200).json({ message: 'User followed successfully' });
+});
+
+// @desc    Unfollow a user
+// @route   POST /api/users/unfollow
+// @access  Private
+const unfollowUser = asyncHandler(async (req, res) => {
+  const { usernameToUnfollow } = req.body;
+
+  if (!usernameToUnfollow) {
+    return res.status(400).json({ error: 'Username to unfollow is required' });
+  }
+
+  const userToUnfollow = await User.findOne({ username: usernameToUnfollow });
+
+  if (!userToUnfollow) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  const user = req.user;
+
+  if (!userToUnfollow.followers.includes(user.username)) {
+    res.status(400);
+    throw new Error('You do not follow this user');
+  }
+
+  userToUnfollow.followers = userToUnfollow.followers.filter(
+    (username) => username !== user.username
+  );
+  user.following = user.following.filter(
+    (username) => username !== userToUnfollow.username
+  );
+
+  await userToUnfollow.save();
+  await user.save();
+
+  res.status(200).json({ message: 'User unfollowed successfully' });
+});
+
+
 export { authUser,
     registerUser,
     logoutUser,
     getUserProfile,
     updateUserProfile,
   deleteUser,
-  getUsers};
+  getUsers,
+  followUser, 
+  unfollowUser};
